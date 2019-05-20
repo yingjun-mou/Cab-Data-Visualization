@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>svg tooltip</title><!-- make your own with https://www.favicon.cc/-->
+        <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Alfa+Slab+One" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
+		<script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+		<style type="text/css">
+            body{font-family:helvetica;}
+            polyline { 
+                stroke: steelblue;
+                stroke-width: 1;
+                fill: none;
+            }
+
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: black;
+                stroke-width: 1;
+                shape-rendering: crispEdges;
+            }
+            .overlay {
+			  fill: none;
+			  pointer-events: all;
+			}
+
+			.focus circle {
+			  fill: #F1F3F3;
+			  stroke: #6F257F;
+			  stroke-width: 5px;
+			}
+			  
+			.hover-line {
+			  stroke: #6F257F;
+			  stroke-width: 2px;
+			  stroke-dasharray: 3,3;
+			}
+
+			.legend rect {
+			  fill:white;
+			  stroke:black;
+			  opacity:0.8;
+			}
+
+            #button1{border:2px solid #000; border-radius:5px;padding:5px;width:100px;background-color: rgb(230,230,230);}
+            #button1:hover {background-color: #4CAF50; /* Green */  color: white;
+            	box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);}
+            #button2{border:2px solid #000; border-radius:5px;padding:5px;width:100px;background-color: rgb(230,230,230);}
+            #button2:hover {background-color: #4CAF50; /* Green */  color: white;
+            	box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);}
+            #area1{background-color: ghostwhite; padding:10px;}
+            #area2{background-color: ghostwhite; padding:10px;}
+            #area3{background-color: ghostwhite;padding:10px;}
+
+            /*#textbox1{background-color: khaki;padding:100px;font-family: inconsolata;font-size: 72px;line-height: 20px;} */
+            #textbox1{background-color: khaki;padding:100px; font-family: 'Special Elite', cursive; font-size: 60px;line-height: 20px;}
+            #textbox2{background-color: papayawhip;padding:10px;}
+            #textbox3{background-color: papayawhip;padding:10px;}
+
+	
+
+            div.tooltip {	
+			    position: absolute;			
+			    text-align: center;			
+			    width: 200px;					
+			    height: auto;					
+			    padding: 10px;				
+			    font: 15px sans-serif;		
+			    background-color: ivory;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+                -webkit-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+                -mox-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.4);		
+			    pointer-events: none;			
+			}
+
+            div.tooltip.hidden {
+                display: none;
+            }
+
+            div.tooltip p {
+                margin: 0;
+                font-family: sans-serif;
+                font-size: 16px;
+                line-height: 20px;
+            }
+
+		</style>
+	</head>
+    <!-- //=========================================== -->
+    <div id="textbox1">
+        <p><strong>NYC yellow cab data</strong></p>
+        <p>and tipping percentage patterns</p>
+    </div>
+        <div id="textbox2">
+        <p>           data source: 2018 Yellow Taxi Trip Data from NYC 311 data</p>
+        <p>           https://data.cityofnewyork.us/Transportation/2018-Yellow-Taxi-Trip-Data/t29m-gskq</p>
+    </div>
+    <div id="area1"></div>
+    <div id="area2"></div>
+    <div id="empty1">
+    	<p><strong>                          </strong></p>
+    </div>  
+    <div id="textbox2">        
+        <p><strong>Another Graph</strong></p>
+        <p>The two scatter plots above show the tip percentage in relation to trip distance and total fare amount</p>
+        <p>While it can describe how the data scatter in a two-dimensional scale, the density of spots is subject to the data's unven distribution in the x dimension  </p>
+        <p>In this case, a diverging bar charts of tip percentage and trip distance came into place</p>
+        <p>Press the <strong>"Sort Distance"</strong> buttom below to sort data in the ascending order of trip distance. Press the <strong>"Reverse"</strong> buttom to reverse the sorting order</p>
+    </div> 
+    <div id="area3">
+    	<button id="button1">Sort Distance</button>
+    	<button id="button2">Reverse</button>
+    </div>
+    <div id="textbox3">        
+        <p><strong>Conclusions</strong></p>
+        <p>Among the 500 samples:</p>
+        <p><strong>(1)</strong> the tip percentage range from <strong>0%</strong> to <strong>29.82%</strong>, with its average equals to <strong>11.2%</strong></p>
+        <p><strong>(2)</strong> the trip distance range from <strong>0</strong> to <strong>20.27 miles</strong>, with its average equals to <strong>8.9 miles</strong></p>
+        <p><strong>(3)</strong> the total fare amount range from <strong>0</strong> to <strong>$70.27</strong>, with its average equals to <strong>$15.6</strong></p>
+        <p><strong>(4)</strong> from scatter plots, there are 2 different types of tipping patterns: (a) tipping in a constant rate (most of them <strong>16.5%</strong> or <strong>0%</strong>) and (b) tipping in <strong>inverse proportion</strong> to the total amount paid and the trip distance.</p>
+
+    </div> 
+
+    <!-- //=========================================== -->
+	<body>
+		<script type="text/javascript">	
+
+//==========================================================================
+//==========================================================================
+
+            var margin = {top: 20, right: 20, bottom: 30, left: 40}
+            var height = 700 - margin.top -margin.bottom //h=300
+            var width = 1400 - margin.left -margin.right//w=700
+
+
+           	// setup d: trip_distance      
+           	var dValue = function(d) {return d.trip_distance;}
+           	// var	dScale = d3.scaleLinear().range([0, width])
+           	var	dScale = d3.scaleLinear().domain([0,20]).range([0, width])
+           	var	dScale2 = d3.scaleLinear().domain([0,30]).range([height/2, height])
+           	var dMap = function(d) {return dScale(dValue(d));}
+           	var dAxis = d3.axisBottom(dScale)
+           	var dAxis2 = d3.axisLeft(dScale2)
+
+           	// setup t: total_amount 
+           	var tValue = function(d) {return d.total_amount;}
+           	var	tScale = d3.scaleLinear().domain([0,70]).range([0, width])
+           	var tMap = function(d) {return tScale(tValue(d));}
+           	var tAxis = d3.axisBottom(tScale)
+
+           	// setup r: tip_ratio
+           	var rValue = function(d) {return d.tip_ratio;}
+           	var	rScale = d3.scaleLinear().domain([0,30]).range([height, 0])
+           	var	rScale2 = d3.scaleLinear().domain([0,30]).range([height/2, 0])
+           	var rMap = function(d) {return rScale(rValue(d));}
+           	var rAxis = d3.axisLeft(rScale)
+           	var rAxis2 = d3.axisLeft(rScale2)
+
+           	// setup c: passenger_count 
+           	var cValue = function(d) {return d.passenger_count;}
+           	var radiusMap = function(d) {return 7*cValue(d);}
+
+
+           	var colorScale = d3.scaleLinear().domain([0,25]).range([0, 20])
+           	var color = d3.scaleThreshold()
+				.domain([0, 12, 20])  
+				.range(["lightpink","salmon","maroon"]);
+
+
+           	var svg1 = d3.select("#area1").append("svg")
+           		.attr("width", width + margin.left + margin.right)
+           		.attr("height", height + margin.top + margin.bottom)
+           		.append("g")
+           		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+           	var svg2 = d3.select("#area2").append("svg")
+           		.attr("width", width + margin.left + margin.right)
+           		.attr("height", height + margin.top + margin.bottom)
+           		.append("g")
+           		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+           	var svg3 = d3.select("#area3").append("svg")
+           		.attr("width", width + margin.left + margin.right)
+           		.attr("height", height + margin.top + margin.bottom)
+           		.append("g")
+           		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            var my_tooltip = d3.select("#area1").append("div")
+			    .attr("class", "tooltip")
+			    .style("opacity", 0);
+
+
+			var pt_lstA = []
+            var pt_lstB = []
+            var obj_lst = []
+            var as_tipRatio = []
+            var de_tipRatio = []
+            var as_tripDis = []
+            var de_tripDis = []
+            var size = 0
+
+            var adj_list_d = []
+            var adj_list_t = []
+
+            var cluster_threshold = 200 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+            var yScale = d3.scaleLinear().domain([0,30]).range([0,height/2]) 
+
+			var ascending = true
+
+//==========================================================================
+//==========================================================================
+           	d3.csv("cabdata_950.csv")  //CHANGE THE FILE NAME @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            .then(function(data){ 	
+            	var xScale = d3.scaleBand().domain(d3.range(data.length)).range([0,width]).round(false).paddingInner(.5)
+            	data.forEach(function(d,i){
+            		pt_lstA.push(xScale(i)+xScale.bandwidth()/2)
+                    pt_lstA.push(height/2-yScale(d["tip_ratio"]))
+
+                    pt_lstB.push(xScale(i)+xScale.bandwidth()/2)
+                    pt_lstB.push(height/2 + yScale(d["trip_distance"]))
+
+                    var obj = new Object();
+                    obj.index = i;
+                    obj.trip_distance = d["trip_distance"];
+                    obj.tip_ratio = d["tip_ratio"];
+                    obj.total_amount = d["total_amount"];
+                    obj_lst.push(obj)
+            	})
+				obj_lst.sort(function(a, b){
+				    return a["trip_distance"]-b["trip_distance"];
+				})
+
+				size = obj_lst.length
+
+				for (var i=0; i<size; i++){
+					adj_list_d.push([])
+					adj_list_t.push([])
+				}
+
+				//HERE IS THE CONSTRUCTION OF adj_list!!!!!!!!!!!!!!!!!!!!!!!!!
+				for (var i=0; i<size; i++){ 
+					var now = obj_lst[i]
+					for (var j=i+1; j<size; j++){
+						var each = obj_lst[j]
+						var dx = Math.abs(dScale(now.trip_distance) - dScale(each.trip_distance))
+						var dt = Math.abs(tScale(now.total_amount) - tScale(each.total_amount))
+						var dy = Math.abs(rScale(now.tip_ratio) - rScale(each.tip_ratio))
+
+						if (dx*dx + dy*dy < cluster_threshold*cluster_threshold) {
+							adj_list_d[now.index].push(each)
+							adj_list_d[each.index].push(now)								
+						}
+						if (dt*dt + dy*dy < cluster_threshold*cluster_threshold) {
+							adj_list_t[now.index].push(each)
+							adj_list_t[each.index].push(now)								
+						}
+					}
+				}
+
+				var avg_tipRatio = d3.mean(data, function(d) { return d.tip_ratio; });
+				var avg_tripDis = d3.mean(data, function(d) { return d.trip_distance; });
+				var avg_totalFare = d3.mean(data, function(d) { return d.total_amount; });
+
+				for(var i in obj_lst) {
+					as_tipRatio.push(xScale(i)+xScale.bandwidth()/2)
+					as_tipRatio.push(height/2-yScale(obj_lst[i].tip_ratio))
+					de_tipRatio.push(xScale(i)+xScale.bandwidth()/2)
+					de_tipRatio.push(height/2-yScale(obj_lst[size-1-i].tip_ratio))
+					as_tripDis.push(xScale(i)+xScale.bandwidth()/2)
+					as_tripDis.push(height/2+yScale(obj_lst[i].trip_distance))
+					de_tripDis.push(xScale(i)+xScale.bandwidth()/2)
+					de_tripDis.push(height/2+yScale(obj_lst[size-1-i].trip_distance))
+				};
+
+            	//==========================================================================
+				//==========================================================================
+	            function sortBars(obj_lst){
+
+	            	//By default, always sort the trip_distance in an ascending order
+	                var chart1 = d3.select("#area3")
+
+	                chart1.selectAll(".my_rectA")
+	                  .transition()
+	                  .duration(1000)
+	                  .delay(function(d,i){
+	                      return i*10
+	                  })
+	                  .attr("y",function(d,i){
+	                  	  return height/2-yScale(obj_lst[i].tip_ratio)
+	                  })
+	                  .attr("height",function(d,i){
+	                  	  return yScale(obj_lst[i].tip_ratio)
+	                  })
+	                  .attr("fill", function(d,i){return color(colorScale(obj_lst[i].tip_ratio)); })
+
+	                chart1.selectAll(".my_circleA")
+	                .data(obj_lst)
+	                .transition()
+	                .duration(1000)
+	                .delay(function(d,i){
+	                    return i*10
+	                })
+	                .ease(d3.easeCubic)
+	                .attr("cy",function(d,i){
+	                    return height/2-yScale(obj_lst[i].tip_ratio) 
+	                })
+	                .attr("fill", "springgreen")
+
+
+	                chart1.selectAll(".my_rectB")
+	                  .transition()
+	                  .duration(1000)
+	                  .delay(function(d,i){
+	                      return i*10
+	                  })
+	                  .attr("y",function(d,i){
+	                  	  return height/2
+	                  })
+	                  .attr("height",function(d,i){
+	                  	  return yScale(obj_lst[i].trip_distance)
+	                  })
+
+	                chart1.selectAll(".my_circleB")
+	                .data(obj_lst)
+	                .transition()
+	                .duration(1000)
+	                .delay(function(d,i){
+	                    return i*10
+	                })
+	                .ease(d3.easeCubic)
+	                .attr("cy",function(d,i){
+	                    return height/2+yScale(obj_lst[i].trip_distance) 
+	                })
+	                .attr("fill", "springgreen")
+
+
+	                chart1.selectAll(".lineA")   // change the line
+                    .transition()
+                    .duration(1000)
+                    .delay(function(d,i){
+                        return i*10
+                    })
+                    .attr("points", as_tipRatio);
+
+
+                    chart1.selectAll(".lineB")   // change the line
+                    .transition()
+                    .duration(1000)
+                    .delay(function(d,i){
+                        return i*10
+                    })
+                    .attr("points", as_tripDis);
+	            }  
+
+	            function reverseSort(obj_lst){
+	                var chart1 = d3.select("#area3")
+	                var size = obj_lst.length
+
+	                if(ascending == true){
+		                chart1.selectAll(".my_rectA")
+		                  .transition()
+		                  .duration(1000)
+		                  .delay(function(d,i){
+		                      return i*10
+		                  })
+		                  .attr("y",function(d,i){
+		                  	  return height/2-yScale(obj_lst[size-1-i].tip_ratio)
+		                  })
+		                  .attr("height",function(d,i){
+		                  	  return yScale(obj_lst[size-1-i].tip_ratio)
+		                  })
+		                  .attr("fill", function(d,i){return color(colorScale(obj_lst[size-1-i].tip_ratio)); })
+
+		                chart1.selectAll(".my_rectB")
+		                  .transition()
+		                  .duration(1000)
+		                  .delay(function(d,i){
+		                      return i*10
+		                  })
+		                  .attr("y",function(d,i){
+		                  	  return height/2
+		                  })
+		                  .attr("height",function(d,i){
+		                  	  return yScale(obj_lst[size-1-i].trip_distance)
+		                  })
+
+
+		                chart1.selectAll(".my_circleA")
+		                 .data(obj_lst)
+		                 .transition()
+		                 .duration(1000)
+		                 .delay(function(d,i){
+		                     return i*10
+		                 })
+		                 .ease(d3.easeCubic)
+		                 .attr("cy",function(d,i){
+		                     return height/2-yScale(obj_lst[size-1-i].tip_ratio) 
+		                 })
+		                 .attr("fill", "red")
+
+
+		                chart1.selectAll(".my_circleB")
+		                 .data(obj_lst)
+		                 .transition()
+		                 .duration(1000)
+		                 .delay(function(d,i){
+		                     return i*10
+		                 })
+		                 .ease(d3.easeCubic)
+		                 .attr("cy",function(d,i){
+		                     return height/2+yScale(obj_lst[size-1-i].trip_distance) 
+		                 })
+		                 .attr("fill", "red")
+
+
+		                chart1.selectAll(".lineA")   // change the line
+                        .transition()
+                        .duration(1000)
+                        .delay(function(d,i){
+                            return i*10
+                        })
+                        .attr("points", de_tipRatio);
+
+
+                        chart1.selectAll(".lineB")   // change the line
+                        .transition()
+                        .duration(1000)
+                        .delay(function(d,i){
+                            return i*10
+                        })
+                        .attr("points", de_tripDis);
+
+		                ascending = false		                  
+	                }
+	                else {
+		                chart1.selectAll(".my_rectA")	
+		                  .transition()
+		                  .duration(1000)
+		                  .delay(function(d,i){
+		                      return i*10
+		                  })              
+		                  .attr("y",function(d,i){
+		                  	  return height/2-yScale(obj_lst[i].tip_ratio)
+		                  })
+		                  .attr("height",function(d,i){
+		                  	  return yScale(obj_lst[i].tip_ratio)
+		                  })
+		                  .attr("fill", function(d,i){return color(colorScale(obj_lst[i].tip_ratio)); })
+
+		                chart1.selectAll(".my_rectB")
+		                  .transition()
+		                  .duration(1000)
+		                  .delay(function(d,i){
+		                      return i*10
+		                  })
+		                  .attr("y",function(d,i){
+		                  	  return height/2
+		                  })
+		                  .attr("height",function(d,i){
+		                  	  return yScale(obj_lst[i].trip_distance)
+		                  })
+
+		                chart1.selectAll(".my_circleA")
+		                 .data(obj_lst)
+		                 .transition()
+		                 .duration(1000)
+		                 .delay(function(d,i){
+		                     return i*10
+		                 })
+		                 .ease(d3.easeCubic)
+		                 .attr("cy",function(d,i){
+		                     return height/2-yScale(obj_lst[i].tip_ratio) 
+		                 })
+		                 .attr("fill", "springgreen")
+
+
+		                chart1.selectAll(".my_circleB")
+		                 .data(obj_lst)
+		                 .transition()
+		                 .duration(1000)
+		                 .delay(function(d,i){
+		                     return i*10
+		                 })
+		                 .ease(d3.easeCubic)
+		                 .attr("cy",function(d,i){
+		                     return height/2+yScale(obj_lst[i].trip_distance) 
+		                 })
+		                 .attr("fill", "springgreen")
+
+
+		                chart1.selectAll(".lineA")   // change the line
+                        .transition()
+                        .duration(1000)
+                        .delay(function(d,i){
+                            return i*10
+                        })
+                        .attr("points", as_tipRatio);
+
+
+                        chart1.selectAll(".lineB")   // change the line
+                        .transition()
+                        .duration(1000)
+                        .delay(function(d,i){
+                            return i*10
+                        })
+                        .attr("points", as_tripDis);
+
+		                ascending = true
+	                }             
+
+	            }
+            	//====================================================
+            	svg1.append("g")
+            		.attr("class", "x axis")
+            		.attr("transform", "rotate(-90)")
+            		.attr("transform", "translate(0," + height + ")")
+            		.call(dAxis)
+
+			    // y-axis
+			    svg1.append("g")
+			        .attr("class", "y axis")
+			        .call(rAxis);
+
+			    svg1.append("text")
+			        .attr("transform", "rotate(-90)")
+			        .attr("y", 0 - margin.left)
+			        .attr("x",0 - (height / 2))
+			        .attr("dy", "1em")
+			        .style("text-anchor", "middle")
+			        .text("Tip Percentage");
+			    svg1.append("text") 
+			        .attr("x", width - margin.right)
+			        .attr("y",height - margin.bottom/2)
+			        .style("text-anchor", "end")
+			        .text("Trip Distance (miles)");
+
+			    svg1.append("g")			       
+			       .append("line")
+			       .attr("x2", width)
+			       .style("stroke", "#2ecc71")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate(0, "+rScale(avg_tipRatio)+")")
+
+			    svg1.append("g")			       
+			       .append("line")
+			       .attr("y2", height)
+			       .style("stroke", "#2ecc71")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate("+rScale(avg_tripDis)+",0)")
+
+			    //===================================================================
+			    var focusA = svg1.append("g")
+			        .attr("class", "focus")
+			        .style("display", "none");
+
+			    focusA.append("line")
+			    //vertical line
+			        .attr("class", "x-hover-line hover-line")
+
+			    focusA.append("line")
+			    //horizontal line
+			        .attr("class", "y-hover-line hover-line");
+
+			    focusA.append("circle")
+			        .attr("r", 7.5);
+
+			    focusA.append("text")
+			        .attr("x", 15)
+			      	.attr("dy", ".31em");
+
+			    svg1.append("rect")
+			        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			        .attr("class", "overlay")
+			        .attr("width", width)
+			        .attr("height", height)
+			        .on("mouseover", function() { focusA.style("display", null); })
+			        .on("mouseout", function() { focusA.style("display", "none"); })
+			        .on("mousemove", mousemoveA);
+
+
+			    //Legends====================================================================
+			    svg1.append("rect")
+            		.attr("class", "legend_dotA")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 20) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg1.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 30) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("x coordinate:  trip distance in miles");
+			    svg1.append("rect")
+            		.attr("class", "legend_dotA")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 50) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg1.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 60) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("y coordinate:  tip percentage");
+			    svg1.append("rect")
+            		.attr("class", "legend_dotA")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 80) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg1.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 90) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("radius:  number of paasengers");
+		      	svg1.append("g")			       
+			       .append("line")
+			       .attr("x1", width/30)
+			       .style("stroke", "#2ecc71")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate(" + (width - 320) + "," + (margin.top + 120) +")")
+            	svg1.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 120) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("dash lines: average distance & tip ratio")
+			    //Legends====================================================================
+
+
+
+			    function mousemoveA() {
+			      var x0 = dScale.invert(d3.mouse(this)[0] + margin.left)
+			      var y0 = rScale.invert(d3.mouse(this)[1]) - 1
+			      
+			      //among the sorted list of obj_lst or as_tripDis, find the one which is closest to x0
+			      //that object will be closest
+			      var closest = obj_lst[0]
+			      var closest_id = 0
+			      var adjacent = null
+			      for(var i=0; i<size; i++){
+			      	if (Math.pow(Math.abs(x0 - closest.trip_distance),2) + Math.pow(Math.abs(y0 - closest.tip_ratio),2) 
+			      		> Math.pow(Math.abs(x0 - obj_lst[i].trip_distance),2) + Math.pow(Math.abs(y0 - obj_lst[i].tip_ratio),2)) {
+			      		closest = obj_lst[i]
+			      	    closest_id = i
+			      	    if (Math.abs(x0 - closest.trip_distance) < cluster_threshold && y0 - closest.tip_ratio < cluster_threshold){
+			      	    	adjacent = Object.assign(closest)
+			      	    }
+			      	    else{
+			      	    	adjacent = null
+			      	    }
+			      	}
+			      }		
+
+			      focusA.select(".x-hover-line")
+			      //vertical
+                        .attr('x1', x0).attr('y1', height)
+                        .attr('x2', x0).attr('y2', 0)
+                        .attr("transform", "translate(" + (dScale(x0)-6) + "," + 0 + ")");
+                  focusA.select(".y-hover-line")
+                  //horizontal
+                        .attr('x1', 0).attr('y1', y0)
+                        .attr('x2', width).attr('y2', y0)
+			           .attr("transform", "translate(" + 0 + "," + (rScale(y0)-12) + ")");	      
+			      focusA.select("circle")
+			           .attr("transform", "translate(" + dScale(closest.trip_distance) + "," + rScale(closest.tip_ratio) + ")");
+	              focusA.select("text")
+			           .attr("transform", "translate(" + dScale(closest.trip_distance) + "," + rScale(closest.tip_ratio) + ")");
+			      focusA.select("text").text(function() { return parseFloat(closest.tip_ratio).toFixed(2); });	
+
+
+
+			      //Now draw the cluster lines based on the closest
+			      // var this_x = dScale(closest.trip_distance)
+			      // var this_y = rScale(closest.tip_ratio)
+			      // var adj_size = adj_list_d[adjacent.index].length
+			      // svg1.selectAll(".cluster_lines").remove()
+		      	//   if (adjacent == null || adj_size==0){
+		      	// 	svg1.selectAll(".cluster_lines").remove()
+		      	//   }
+		      	//   else{
+	      		//     for(var i=0; i<adj_size; i++){			      	
+			      // 	    svg1.append("g")
+			      // 	    .append("line")
+			      // 	    .attr("class", "cluster_lines")
+			      //       .attr("x1", this_x)
+					    // .attr("y1", this_y)
+					    // .attr("x2", dScale(adj_list_d[adjacent.index][i].trip_distance))
+					    // .attr("y2", rScale(adj_list_d[adjacent.index][i].tip_ratio))
+			      //       .style("stroke", "black")
+			      //       .style("stroke-width", "0.1px")
+		      	//     }			      	    
+		      	//   }
+			    }
+			    //===================================================================
+            	svg1.selectAll(".dot").data(data).enter().append("circle")
+            		.attr("class", "dotA")
+            		.attr("r", radiusMap) //3.5
+            		.attr("cx", dMap)
+            		.attr("cy", rMap)
+            		.style("fill", "red")
+            		// .style("fill", "rgb(" + (Math.round(d * 200)) + "0, 0)")  
+            		.style("opacity", 0.3)
+            		.on("mouseover", function(d) {
+            			var original_r = +d3.select(this).attr("r")
+            			d3.select(this)
+					        .transition()
+					        .duration(100)
+					        .attr('r', original_r*1.5)
+        					.style("fill", "springgreen");
+
+            			//Interactive Tooltip
+            			var tx = parseFloat(d3.select(this).attr("cx"))
+                        var ty = parseFloat(d3.select(this).attr("cy")) + 400
+
+			            my_tooltip.transition()		
+			                .duration(200)		
+			                .style("opacity", .9);		
+			            my_tooltip.html("<b>" + "Tip Percentage "+"</b>" +   + parseFloat(d["tip_ratio"]).toFixed(2) + "%"
+			            	+ "<br/><b>"  + "Trip Distance "+"</b>"  + parseFloat(d["trip_distance"]).toFixed(2)+ " Miles"
+			            	+ "<br/><b>"  + "Passenger "+"</b>"  + d["passenger_count"])
+			            	.style("left", tx+50 + "px")		
+                			.style("top", ty-50 + "px");;	
+			            d3.select("#tooltip").classed("hidden", false); 
+			            })
+    		        .on("mouseout", function(d) {
+    		        	var enlarged_r = +d3.select(this).attr("r")
+    		        	d3.select(this)
+					        .transition()
+					        .duration(100)
+					        .attr('r', enlarged_r/1.5)
+        					.style("fill", "red").style("opacity", 0.5);
+    		        	d3.select("#tooltip").classed("hidden", true);		
+			            my_tooltip.transition()		
+			                .duration(500)		
+			                .style("opacity", 0);
+			        })
+			    //====================================================
+            	//====================================================
+            	svg2.append("g")
+            		.attr("class", "x axis")
+            		.attr("transform", "translate(0," + height + ")")
+            		.call(tAxis)
+			    // y-axis
+			    svg2.append("g")
+			        .attr("class", "y axis")
+			        .call(rAxis)
+
+			    svg2.append("text")
+			        .attr("transform", "rotate(-90)")
+			        .attr("y", 0 - margin.left)
+			        .attr("x",0 - (height / 2))
+			        .attr("dy", "1em")
+			        .style("text-anchor", "middle")
+			        .text("Tip Percentage");
+			    svg2.append("text") 
+			        .attr("x", width - margin.right)
+			        .attr("y",height - margin.bottom/2)
+			        .style("text-anchor", "end")
+			        .text("Total Fare (dollars)");
+
+			    svg2.append("g")			       
+			       .append("line")
+			       .attr("x2", width)
+			       .style("stroke", "orange")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate(0, "+rScale(avg_tipRatio)+")")
+
+			    svg2.append("g")			       
+			       .append("line")
+			       .attr("y2", height)
+			       .style("stroke", "orange")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate("+rScale(avg_totalFare)+",0)")
+
+			    //===================================================================
+			    var focusB = svg2.append("g")
+			        .attr("class", "focus")
+			        .style("display", "none");
+
+			    focusB.append("line")
+			    //vertical line
+			        .attr("class", "x-hover-line hover-line")
+
+			    focusB.append("line")
+			    //horizontal line
+			        .attr("class", "y-hover-line hover-line");
+
+			    focusB.append("circle")
+			        .attr("r", 7.5);
+
+			    focusB.append("text")
+			        .attr("x", 15)
+			      	.attr("dy", ".31em");
+
+			    svg2.append("rect")
+			        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			        .attr("class", "overlay")
+			        .attr("width", width)
+			        .attr("height", height)
+			        .on("mouseover", function() { focusB.style("display", null); })
+			        .on("mouseout", function() { focusB.style("display", "none"); })
+			        .on("mousemove", mousemoveB);
+
+
+			    //Legends====================================================================
+			    svg2.append("rect")
+            		.attr("class", "legend_dotB")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 20) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg2.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 30) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("x coordinate:  total fare amount in dollars");
+			    svg2.append("rect")
+            		.attr("class", "legend_dotB")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 50) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg2.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 60) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("y coordinate:  tip percentage");
+			    svg2.append("rect")
+            		.attr("class", "legend_dotB")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 80) + ")")
+            		.attr("width", 20)
+			        .attr("height", 20)
+            		.style("fill", "black")
+            		.style("opacity", 0.5)
+            	svg2.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 90) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("radius:  number of paasengers");
+			    svg2.append("g")			       
+			       .append("line")
+			       .attr("x1", width/30)
+			       .style("stroke", "orange")
+			       .style("stroke-dasharray", "8,4")
+			       .style("stroke-width", "2px")
+			       .attr("transform", "translate(" + (width - 320) + "," + (margin.top + 120) +")")
+            	svg2.append("text")
+            		.attr("transform", "translate(" + (width - 300) + "," + (margin.top + 120) +")")
+			        .attr("x", 30)
+			      	.attr("dy", ".31em")
+			      	.text("dash lines: average total fare & tip ratio")
+			    //Legends====================================================================
+
+			    function mousemoveB() {
+			      var x0 = tScale.invert(d3.mouse(this)[0] + margin.left)
+			      var y0 = rScale.invert(d3.mouse(this)[1]) - 1
+
+			      //among the sorted list of obj_lst or as_tripDis, find the one which is closest to x0!!!!!!!!!!!!!! &&&&&&&&&&&&&&&&&&&&&&&&&&
+			      //that object will be closest
+			      var closest = obj_lst[0]
+			      var closest_id = 0
+			      var adjacent = null
+			      for(var i=0; i<size; i++){
+			      	if (Math.pow(Math.abs(x0 - closest.total_amount),2) + Math.pow(Math.abs(y0 - closest.tip_ratio),2) 
+			      		> Math.pow(Math.abs(x0 - obj_lst[i].total_amount),2) + Math.pow(Math.abs(y0 - obj_lst[i].tip_ratio),2)) {
+			      		closest = obj_lst[i]
+			      	    closest_id = i
+			      	    if (Math.abs(x0 - closest.total_amount) < cluster_threshold && y0 - closest.tip_ratio < cluster_threshold){
+			      	    	adjacent = Object.assign(closest)
+			      	    }
+			      	    else{
+			      	    	adjacent = null
+			      	    }
+			      	}
+			      }	
+
+			      focusB.select(".x-hover-line")
+			      //vertical
+                        .attr('x1', x0).attr('y1', height)
+                        .attr('x2', x0).attr('y2', 0)	
+                        .attr("transform", "translate(" + (tScale(x0)-32) + "," + 0 + ")");
+                  focusB.select(".y-hover-line")
+                  //horizontal
+                        .attr('x1', 0).attr('y1', y0)
+                        .attr('x2', width).attr('y2', y0)
+			           .attr("transform", "translate(" + 0 + "," + (rScale(y0)-12) + ")");	      
+			      focusB.select("circle")
+			           .attr("transform", "translate(" + tScale(closest.total_amount) + "," + rScale(closest.tip_ratio) + ")");
+	              focusB.select("text")
+			           .attr("transform", "translate(" + tScale(closest.total_amount) + "," + rScale(closest.tip_ratio) + ")");
+			      focusB.select("text").text(function() { return parseFloat(closest.tip_ratio).toFixed(2); });
+
+			      //Now draw the cluster lines based on the closest
+			      // var this_x = tScale(closest.total_amount)
+			      // var this_y = rScale(closest.tip_ratio)
+			      // var adj_size = adj_list_t[adjacent.index].length
+			      // svg2.selectAll(".cluster_lines").remove()
+		      	//   if (adjacent == null || adj_size==0){
+		      	// 	svg2.selectAll(".cluster_lines").remove()
+		      	//   }
+		      	//   else{
+	      		//     for(var i=0; i<adj_size; i++){			      	
+			      // 	    svg2.append("g")
+			      // 	    .append("line")
+			      // 	    .attr("class", "cluster_lines")
+			      //       .attr("x1", this_x)
+					    // .attr("y1", this_y)
+					    // .attr("x2", tScale(adj_list_t[adjacent.index][i].total_amount))
+					    // .attr("y2", rScale(adj_list_t[adjacent.index][i].tip_ratio))
+			      //       .style("stroke", "black")
+			      //       .style("stroke-width", "0.1px")
+		      	//     }			      	    
+		      	//   }			      
+			    }					      
+			    //================================================================== 
+            	svg2.selectAll(".dot").data(data).enter().append("circle")
+            		.attr("class", "dotB")
+            		.attr("r", radiusMap)
+            		.attr("cx", tMap)
+            		.attr("cy", rMap)
+            		.style("fill", "blue") 
+            		.style("opacity", 0.3)
+            		.on("mouseover", function(d) {
+            			var original_r = +d3.select(this).attr("r")
+            			d3.select(this)
+					        .transition()
+					        .duration(100)
+					        .attr('r', original_r*1.5)
+        					.style("fill", "springgreen");
+
+            			//Interactive Tooltip
+            			var tx = parseFloat(d3.select(this).attr("cx"))
+                        var ty = parseFloat(d3.select(this).attr("cy")) + 400
+
+			            my_tooltip.transition()		
+			                .duration(200)		
+			                .style("opacity", .9);		
+			            my_tooltip.html("<b>" + "Tip Percentage "+"</b>" +   + parseFloat(d["tip_ratio"]).toFixed(2) + "%"
+			            	+ "<br/><b>"  + "Total Fare "+"</b>"  + parseFloat(d["total_amount"]).toFixed(2)+ " $"
+			            	+ "<br/><b>"  + "Passenger "+"</b>"  + d["passenger_count"])
+			            	.style("left", tx+50 + "px")		
+                			.style("top", ty-50+height + margin.top + margin.bottom + "px");;	
+			            d3.select("#tooltip").classed("hidden", false); 
+			            })
+    		        .on("mouseout", function(d) {
+    		        	var enlarged_r = +d3.select(this).attr("r")
+    		        	d3.select(this)
+					        .transition()
+					        .duration(100)
+					        .attr('r', enlarged_r/1.5)
+        					.style("fill", "blue").style("opacity", 0.5);
+    		        	d3.select("#tooltip").classed("hidden", true);		
+			            my_tooltip.transition()		
+			                .duration(500)		
+			                .style("opacity", 0);	
+			        });
+
+			    //====================================================
+            	//====================================================
+
+			    svg3.append("g")
+			        .attr("class", "y axis")
+			        .call(rAxis2)
+
+			    svg3.append("g")
+			        .attr("class", "y axis")
+			        .call(dAxis2)
+
+			    svg3.append("text")
+			        .attr("transform", "rotate(-90)")
+			        .attr("y", 0 - margin.left)
+			        .attr("x",0 - (height / 2) +300)
+			        .attr("dy", "1em")
+			        .style("text-anchor", "end")
+			        .text("Tip Percentage");
+			    svg3.append("text")
+			        .attr("transform", "rotate(-90)")
+			        .attr("y", 0 - margin.left)
+			        .attr("x",0 - (height / 2) -200)
+			        .attr("dy", "1em")
+			        .style("text-anchor", "end")
+			        .text("Trip Distance");
+
+
+
+
+			    svg3.append("polyline")   
+                    .attr("class", "lineA")
+				    .attr("points", pt_lstA); 
+
+				svg3.append("polyline")   
+                    .attr("class", "lineB")
+				    .attr("points", pt_lstB); 
+
+				svg3.selectAll("circleA")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "my_circleA")
+                    .attr("cx",function(d,i){
+                        return pt_lstA[2*i]
+                    })
+                    .attr("cy",function(d,i){
+                    	return pt_lstA[2*i+1]
+                    })
+                    .attr("r",3)
+                    .attr("fill", "red")
+
+				svg3.selectAll("circleB")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "my_circleB")
+                    .attr("cx",function(d,i){
+                        return pt_lstB[2*i]
+                    })
+                    .attr("cy",function(d,i){
+                    	return pt_lstB[2*i+1]
+                    })
+                    .attr("r",3)
+                    .attr("fill", "red")
+
+                svg3.selectAll("rectA")
+                    .data(data)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "my_rectA")
+                    .attr("x",function(d,i){
+                        return xScale(i)
+                    })
+                    .attr("y",function(d){
+                    	return -yScale(d.tip_ratio) + height/2
+                    })
+                    .attr("width",xScale.bandwidth())
+                    .attr("height",function(d){
+                        return yScale(d.tip_ratio)
+                    })
+                    .attr("opacity",.8)
+                    .attr('fill',function(d,i) { return color(colorScale(d.tip_ratio)); })
+
+                    .on("mouseover", function(d) {
+            			d3.select(this)
+					        .transition()
+					        .duration(100)
+        					.style("fill", "blue");
+
+            			//Interactive Tooltip
+            			var tx = parseFloat(d3.select(this).attr("x"))
+                        var ty = parseFloat(d3.select(this).attr("y")) +600
+
+			            my_tooltip.transition()		
+			                .duration(200)		
+			                .style("opacity", .9);		
+			            my_tooltip.html("<b>" + "Tip Percentage "+"</b>" +   + parseFloat(d["tip_ratio"]).toFixed(2) + "%"
+			            	+ "<br/><b>"  + "Trip Distance "+"</b>"  + parseFloat(d["trip_distance"]).toFixed(2)+ " Miles"
+			            	+ "<br/><b>"  + "Passenger "+"</b>"  + d["passenger_count"])
+			            	.style("left", tx+50 + "px")		
+                			.style("top", ty-50+ (height + margin.top + margin.bottom)*2 + "px");;	
+			            d3.select("#tooltip").classed("hidden", false); 
+			            })
+    		        .on("mouseout", function(d) {
+    		        	d3.select(this)
+					        .transition()
+					        .duration(100)
+					        .style('fill',color(colorScale((height/2 - d3.select(this).attr("y"))/yScale))).style("opacity", 0.8);
+        					// .style("fill", "crimson").style("opacity", 0.8);
+    		        	d3.select("#tooltip").classed("hidden", true);		
+			            my_tooltip.transition()		
+			                .duration(500)		
+			                .style("opacity", 0);	
+			        });
+			    //=========================================
+			    //=========================================  
+                    d3.select("#button1")
+                            .on("click",function(){ 
+                                sortBars(obj_lst)                        
+                            })  
+
+			    	d3.select("#button2")
+                            .on("click",function(){ 
+                                reverseSort(obj_lst)                       
+                            })
+			    //=========================================
+			    //=========================================                 
+                svg3.selectAll("rectB")
+                    .data(data)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "my_rectB")
+                    .attr("x",function(d,i){
+                        return xScale(i)
+                    })
+                    .attr("y",function(d){
+                    	return height/2
+                    })
+                    .attr("width",xScale.bandwidth())
+                    .attr("height",function(d){
+                        return yScale(d.trip_distance)
+                    })
+                    .attr("opacity",.8)
+                    .attr("fill", "black" )
+
+                    .on("mouseover", function(d) {
+            			d3.select(this)
+					        .transition()
+					        .duration(100)
+        					.style("fill", "blue");
+
+            			//Interactive Tooltip
+            			var tx = parseFloat(d3.select(this).attr("x"))
+                        var ty = parseFloat(d3.select(this).attr("y"))
+
+			            my_tooltip.transition()		
+			                .duration(200)		
+			                .style("opacity", .9);		
+			            my_tooltip.html("<b>" + "Tip Percentage "+"</b>" +   + parseFloat(d["tip_ratio"]).toFixed(2) + "%"
+			            	+ "<br/><b>"  + "Trip Distance "+"</b>"  + parseFloat(d["trip_distance"]).toFixed(2)+ " Miles"
+			            	+ "<br/><b>"  + "Passenger "+"</b>"  + d["passenger_count"])
+			            	.style("left", tx+50 + "px")		
+                			.style("top", ty-50+ (height + margin.top + margin.bottom)*2 + "px");
+			            d3.select("#tooltip").classed("hidden", false); 
+			            })
+    		        .on("mouseout", function(d) {
+    		        	d3.select(this)
+					        .transition()
+					        .duration(100)
+        					.style("fill", "black").style("opacity", 0.8);
+    		        	d3.select("#tooltip").classed("hidden", true);		
+			            my_tooltip.transition()		
+			                .duration(500)		
+			                .style("opacity", 0);	
+			        });
+            })
+            .catch(function(error){ console.log("error")})
+        </script>
+	</body>
+</html>
